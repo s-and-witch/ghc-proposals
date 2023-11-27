@@ -17,6 +17,11 @@ Note that neither direction is (at all) a guarantee: there will be excpetions
 in both directions. Yet by writing down the principles, we can have an informed
 discussion of the tradeoffs of accepted or rejecting an individual proposal.
 
+These priniciples are divided into two section:
+* Language design prinicples (Section 2)
+* GHC stability principles (Section 3)
+
+
 How to update these principles
 ------------------------------
 
@@ -303,3 +308,121 @@ down GHC even when those features are not active. Yet this principle is importan
 as we hope not to make the current situation worse.
 
 From `#378`_, slightly generalized.
+
+
+
+GHC stability principles
+--------------------------
+
+The Haskell ecosystem has a built-in tension between stability and innovation.
+
+One the one hand, breaking changes impose heavy costs:
+
+* Users keep having to update their code
+* Library authors keep having to update their code
+* Updating to a later version of a library can in turn force taking on new dependencies.
+
+These difficulties add friction, discourage adoption, and make Haskell an unpredictable investment.
+
+On the other hand, GHC has always sought to be a laboratory for innovation.  If the stability guarantees are too onerous, we risk imposing a different set of costs:
+
+* Volunteers may get discouraged by the hoops they have to jump through to get a change agreed.
+* The language may become stuck in a local optimum, because moving to a better design would require breaking changes.
+* GHC may become encrusted with cruft and workarounds that exist to preserve existing, but undesirable, behaviour.
+
+We can't navigate this tension with simple all-or-nothing rules.  We have to take each case on its merits, aware of both sets of costs.  Rather than starting the debate from scratch each time, we can have some general rules, or principles, to guide us.  The `GHC base library proposal <https://github.com/haskellfoundation/tech-proposals/blob/main/proposals/accepted/051-ghc-base-libraries.rst>`_ made a start in this direction; this section discusses GHC itself.
+
+Assumptions
+~~~~~~~~~~~~
+
+We assume:
+
+* That we have adopted the  `GHC base library proposal <https://github.com/haskellfoundation/tech-proposals/blob/main/proposals/accepted/051-ghc-base-libraries.rst>`_, which establishes the ``ghc-experimental`` package.
+* That we have adopted some form of `GHC Proposal #601 <https://github.com/ghc-proposals/ghc-proposals/pull/601>`_, which allows us to designate extension flags as Experimental or Stable.  (Maybe other categories too, but at least these two.)  Moreover, we have actually categorised existing extensions, at least far enough to identify the Stable ones.  This is still a work in progress.
+
+
+Stability (GR1)
+~~~~~~~~~~~~~~~~
+
+We define a *stable Haskell package* as follows. A stable Haskell package
+
+* Does not use Experimental extensions.
+* Does not use experimental features.  (Examples: ``INCOHERENT`` pragmas, use of the Javascript or Wasm back end, builds on non-tier-1 platforms.)
+* Does not use ``-Werror`` in its default build configuration.
+* Explicitly specifies a language edition (``Haskell98``, ``GHC2021``), in the source code or the build configuration.
+* Depends only on stable Haskell packages.
+
+Boot packages shipped with GHC will be designated as stable or not in the documentation:
+
+* ``base`` is stable, despite depending on unstable packages.
+* Any GHC-internal packages (e.g. ``ghc-internal``, ``ghc-prim``, ``ghc-bignum``) are not stable and may change API without notice and between minor releases.
+* The ``ghc`` package is not stable. (There is a separate project to define a more stable GHC API, but that is out of scope for this document.)
+* ``ghc-experimental`` is not stable, but should aim to minimise breaking changes as far as feasible, since it is user-facing.
+* ``template-haskell`` is not stable, because it contains AST datatypes which need to be changed as the language evolves.
+
+**General rule (GR1)**.  *A stable Haskell package that works today should continue to work in subsequent releases of GHC (using the same compiler flags of course).*
+
+Notes and clarifications:
+
+* The general goal of "works" includes both "compiles successfully" and "runs successfully, as fast as it did before".  That is a very demanding goal, so it has the status of a highly-sought-after aspiration rather than an unbreakable promise.
+
+* *The ``base`` library*.  Achieving (GR1) depends crucially on the stability of the base package; but that is already under the careful management of the Core Libraries Committee.  However ``base`` does, and should, evolve, so achieving (GR1) really depends on achieving the "reinstallable ``base``" goal.  That is, you should be able to compile a package with (say) GHC 9.16, using a version of ``base`` that exposes precisely the API of the ``base`` that came with GHC 9.12.
+
+* *Warnings*
+
+  * ``-Werror`` is excluded because otherwise (GR1) would be broken whenever we add a warning.
+  * Similarly ``-Werror=flag`` is excluded to allow warnings to fire in more cases without breaking (GR1).
+  * It's fine for a stable package to use ``-Werror`` in a CI build, to help the author find warnings.  But not in the default configuration, used by others when installing the package.
+  * There is no stability guarantee that a later GHC will emit the same warnings as an earlier GHC.  A notable case in point is deprecations, where a later GHC may advise authors to (say) import a function from a different module.  But in general, warnings should not be regarded as stable.
+
+* *Language editions*.
+  * A stable package should specify an explicit language edition because subsequent releases of GHC might change the default language edition.  So if the package does not pin a specific language edition, it might then fail when compiled with a later release.
+  * Language editions like ``GHC202x`` should use only Stable extensions.
+
+* (GR1) is restricted to Stable extensions, and excludes dependence on ``ghc-experimental``.  That leaves the "experimental" space open to more rapid change.
+
+* For new language extensions, (GR1) is trivially satisfied if the change is gated behind an extension flag.
+
+* (GR1) is certainly broken if, say, we turn a warning into an error.
+
+
+* We will need to enumerate the "experimental features" mentioned above.
+
+Exceptions (GR2)
+~~~~~~~~~~~~~~~~
+
+**General rule (GR2)**.   *We may break (GR1), but only with a compelling reason, and with careful consideration of impact.*
+
+Compelling reasons include
+
+* To fix a security loophole.
+* To fix an outright bug in GHC.  It is possible that some code might accidentally rely on that bug; but we can't use that as a reason to grandfather the bug indefinitely.  (Imagine that 2+77 = 80.)  There is a judgement call here, about what a "bug" is.
+* To fix a design flaw in the language.   The switch to simple subsumption is an example of such a change, albeit one that was not well handled at the time.
+
+This list is not exhaustive, but the emphasis is on "compelling reason", bearing in mind the costs that any change imposes on users.
+
+Fixing an outright bug, or correcting (what we now consider to be) a design flaw in the language,counts as "compelling" reasons, even though they threaten stability.
+
+* We want Haskell to be a beautiful, elegant language, not one riddled with inconsistencies, grandfathered in simply because fixing the inconsistency would risk some breakage.
+* Similarly, we acknowledge the possibility of making major changes, if we truly believe that they will make the language better, and/or open the door to other improvements.
+* Yet we should not make such changes lightly, because they impose real costs.
+* Choices should be informed by the amount of breakage, e.g. by compiling thousands of packages in Hackage.
+* Changes, especially significant changes, should be introduced gradually: the subject of (GR3).
+
+Deprecations (GR3)
+~~~~~~~~~~~~~~~~~~~~
+
+**General rule (GR3)**.  *If we break (GR1), for a compelling reason (GR2), we should whenever possible provide a deprecation cycle, as well as copious publicity, so that users are alerted (via depreciation warnings) to the upcoming change, have time to adapt, and can raise concerns.*
+
+A deprecation cycle should give at least one GHC major release for authors to make changes.  In th case of changes that are more difficult to accommodate, we may consider a second cycle.
+
+Note that (GR3) is not a reason to say that (GR1) is unimportant.  A deprecation cycle defers costs; it does not reduce or eliminate them.
+However, deprecation cycles are important.  They give users and library authors time to adapt to changes, without a mad panic.
+
+Even changes to Experimental extensions should seek to follow (GR3), but with a significantly lower "bar".
+
+Mechanisms for checking stability
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Having crisper definitions opens up the possibility of also providing mechanical support, through which a user can declare their intent to use only stable packages.  This is the subject
+of `GHC Proposal #617 <https://github.com/ghc-proposals/ghc-proposals/pull/617>`_.
