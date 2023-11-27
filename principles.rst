@@ -18,8 +18,9 @@ in both directions. Yet by writing down the principles, we can have an informed
 discussion of the tradeoffs of accepted or rejecting an individual proposal.
 
 These priniciples are divided into two section:
-* Language design prinicples (Section 2)
-* GHC stability principles (Section 3)
+
+* `Language design principles <#language-design-principles>`_ (Section 2)
+* `GHC stability principles <#GHC-stability-principles>`_ (Section 3)
 
 
 How to update these principles
@@ -47,7 +48,7 @@ given the multitude of principles in play. Including the abbreviation is useful 
 the abbreviation is used in other fora (e.g. email, GitHub, etc.) to allow the curious
 to find (e.g. with Ctrl+F) the abbreviation within this page.
 
-Accepted principles
+Language design principles
 -------------------
 
 .. _`#281`: proposals/0281-visible-forall.rst
@@ -340,11 +341,10 @@ We assume:
 * That we have adopted the  `GHC base library proposal <https://github.com/haskellfoundation/tech-proposals/blob/main/proposals/accepted/051-ghc-base-libraries.rst>`_, which establishes the ``ghc-experimental`` package.
 * That we have adopted some form of `GHC Proposal #601 <https://github.com/ghc-proposals/ghc-proposals/pull/601>`_, which allows us to designate extension flags as Experimental or Stable.  (Maybe other categories too, but at least these two.)  Moreover, we have actually categorised existing extensions, at least far enough to identify the Stable ones.  This is still a work in progress.
 
+Terminology
+~~~~~~~~~~~~~~~
 
-Stability (GR1)
-~~~~~~~~~~~~~~~~
-
-We define a *stable Haskell package* as follows. A stable Haskell package
+We define a **stable Haskell package** as follows. A stable Haskell package
 
 * Does not use Experimental extensions.
 * Does not use experimental features.  (Examples: ``INCOHERENT`` pragmas, use of the Javascript or Wasm back end, builds on non-tier-1 platforms.)
@@ -360,13 +360,16 @@ Boot packages shipped with GHC will be designated as stable or not in the docume
 * ``ghc-experimental`` is not stable, but should aim to minimise breaking changes as far as feasible, since it is user-facing.
 * ``template-haskell`` is not stable, because it contains AST datatypes which need to be changed as the language evolves.
 
+Stability (GR1)
+~~~~~~~~~~~~~~~~
+
 **General rule (GR1)**.  *A stable Haskell package that works today should continue to work in subsequent releases of GHC (using the same compiler flags of course).*
 
 Notes and clarifications:
 
 * The general goal of "works" includes both "compiles successfully" and "runs successfully, as fast as it did before".  That is a very demanding goal, so it has the status of a highly-sought-after aspiration rather than an unbreakable promise.
 
-* *The ``base`` library*.  Achieving (GR1) depends crucially on the stability of the base package; but that is already under the careful management of the Core Libraries Committee.  However ``base`` does, and should, evolve, so achieving (GR1) really depends on achieving the "reinstallable ``base``" goal.  That is, you should be able to compile a package with (say) GHC 9.16, using a version of ``base`` that exposes precisely the API of the ``base`` that came with GHC 9.12.
+* *The base library*.  Achieving (GR1) depends crucially on the stability of the base package; but that is already under the careful management of the Core Libraries Committee.  However ``base`` does, and should, evolve, so achieving (GR1) really depends on achieving the "reinstallable ``base``" goal.  That is, you should be able to compile a package with (say) GHC 9.16, using a version of ``base`` that exposes precisely the API of the ``base`` that came with GHC 9.12.
 
 * *Warnings*
 
@@ -376,6 +379,7 @@ Notes and clarifications:
   * There is no stability guarantee that a later GHC will emit the same warnings as an earlier GHC.  A notable case in point is deprecations, where a later GHC may advise authors to (say) import a function from a different module.  But in general, warnings should not be regarded as stable.
 
 * *Language editions*.
+
   * A stable package should specify an explicit language edition because subsequent releases of GHC might change the default language edition.  So if the package does not pin a specific language edition, it might then fail when compiled with a later release.
   * Language editions like ``GHC202x`` should use only Stable extensions.
 
