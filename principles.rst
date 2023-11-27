@@ -19,8 +19,8 @@ discussion of the tradeoffs of accepted or rejecting an individual proposal.
 
 These priniciples are divided into two section:
 
-* `Language design principles <#language-design-principles>`_ (Section 2)
-* `GHC stability principles <#GHC-stability-principles>`_ (Section 3)
+* `Language design principles <#2language-design-principles>`_ (Section 2)
+* `GHC stability principles <#3GHC-stability-principles>`_ (Section 3)
 
 
 How to update these principles
@@ -376,7 +376,7 @@ Notes and clarifications:
   * ``-Werror`` is excluded because otherwise (GR1) would be broken whenever we add a warning.
   * Similarly ``-Werror=flag`` is excluded to allow warnings to fire in more cases without breaking (GR1).
   * It's fine for a stable package to use ``-Werror`` in a CI build, to help the author find warnings.  But not in the default configuration, used by others when installing the package.
-  * There is no stability guarantee that a later GHC will emit the same warnings as an earlier GHC.  A notable case in point is deprecations, where a later GHC may advise authors to (say) import a function from a different module.  But in general, warnings should not be regarded as stable.
+  * There is no stability guarantee that a later GHC will emit the same warnings as an earlier GHC.  A notable case in point is deprecations, where a later GHC may advise authors to (say) import a function from a different module; while an earlier GHC obviously will not.  In general, warnings should not be regarded as stable.
 
 * *Language editions*.
 
