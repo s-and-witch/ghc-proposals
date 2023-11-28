@@ -405,7 +405,7 @@ Compelling reasons include
 
 This list is not exhaustive, but the emphasis is on "compelling reason", bearing in mind the costs that any change imposes on users.
 
-Fixing an outright bug, or correcting (what we now consider to be) a design flaw in the language,counts as "compelling" reasons, even though they threaten stability.
+Fixing an outright bug, or correcting (what we now consider to be) a design flaw in the language, counts as "compelling" reasons, even though they threaten stability.
 
 * We want Haskell to be a beautiful, elegant language, not one riddled with inconsistencies, grandfathered in simply because fixing the inconsistency would risk some breakage.
 * Similarly, we acknowledge the possibility of making major changes, if we truly believe that they will make the language better, and/or open the door to other improvements.
