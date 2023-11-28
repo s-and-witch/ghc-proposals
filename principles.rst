@@ -339,7 +339,8 @@ Assumptions
 We assume:
 
 * That we have adopted the  `GHC base library proposal <https://github.com/haskellfoundation/tech-proposals/blob/main/proposals/accepted/051-ghc-base-libraries.rst>`_, which establishes the ``ghc-experimental`` package.
-* That we have adopted some form of `GHC Proposal #601 <https://github.com/ghc-proposals/ghc-proposals/pull/601>`_, which allows us to designate extension flags as Experimental or Stable.  (Maybe other categories too, but at least these two.)  Moreover, we have actually categorised existing extensions, at least far enough to identify the Stable ones.  This is still a work in progress.
+* That we have identified some extensions as "Experimental".  These extensions may well change, and are subject to
+  much weaker stability goals.  `GHC Proposal #601 <https://github.com/ghc-proposals/ghc-proposals/pull/601>`_, describes a plan along these lines, but all we need for this document is a list of Experimental extensions.
 
 Terminology
 ~~~~~~~~~~~~~~~
@@ -347,7 +348,8 @@ Terminology
 We define a **stable Haskell package** as follows. A stable Haskell package
 
 * Does not use Experimental extensions.
-* Does not use experimental features.  (Examples: ``INCOHERENT`` pragmas, use of the Javascript or Wasm back end, builds on non-tier-1 platforms.)
+* Does not use experimental features.  (Examples: use of the Javascript or Wasm back end, builds on non-tier-1 platforms.)
+* Does not rely on explicitly-undefined behaviour. (Example: ``INCOHERENT`` instance selection.)
 * Does not use ``-Werror`` in its default build configuration.
 * Explicitly specifies a language edition (``Haskell98``, ``GHC2021``), in the source code or the build configuration.
 * Depends only on stable Haskell packages.
@@ -383,7 +385,7 @@ Notes and clarifications:
   * A stable package should specify an explicit language edition because subsequent releases of GHC might change the default language edition.  So if the package does not pin a specific language edition, it might then fail when compiled with a later release.
   * Language editions like ``GHC202x`` should use only Stable extensions.
 
-* (GR1) is restricted to Stable extensions, and excludes dependence on ``ghc-experimental``.  That leaves the "experimental" space open to more rapid change.
+* (GR1) is restricted to non-experimental extensions, and excludes dependence on ``ghc-experimental``.  That leaves the "experimental" space open to more rapid change.
 
 * For new language extensions, (GR1) is trivially satisfied if the change is gated behind an extension flag.
 

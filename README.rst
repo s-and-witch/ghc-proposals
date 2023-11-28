@@ -414,7 +414,7 @@ Review criteria
 ---------------
 Here are some characteristics that a good proposal should have.
 
-* *It should follow our design _principles*.  These principles cover both the language *design* and its *stability* over time.
+* *It should follow our design principles*.  These principles_ cover both the language *design* and its *stability* over time.
 
 * *It should be self-standing*.  Some proposals accumulate a long and interesting discussion
   thread, but in ten years' time all that will be gone (except for the most assiduous readers).
