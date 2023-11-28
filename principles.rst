@@ -355,7 +355,7 @@ We define a **stable Haskell package** as follows. A stable Haskell package
 Boot packages shipped with GHC will be designated as stable or not in the documentation:
 
 * ``base`` is stable, despite depending on unstable packages.
-* Any GHC-internal packages (e.g. ``ghc-internal``, ``ghc-prim``, ``ghc-bignum``) are not stable and may change API without notice and between minor releases.
+* Any GHC-internal packages (e.g. ``ghc-internal``, ``ghc-prim``, ``ghc-bignum``) are not stable and may change API without notice and between minor releases of GHC.  (Reminder: the package version of each GHC-internal package follows the PVP -- see the `GHC base library proposal <https://github.com/haskellfoundation/tech-proposals/blob/main/proposals/accepted/051-ghc-base-libraries.rst#3things-we-all-agree-about>`_.)
 * The ``ghc`` package is not stable. (There is a separate project to define a more stable GHC API, but that is out of scope for this document.)
 * ``ghc-experimental`` is not stable, but should aim to minimise breaking changes as far as feasible, since it is user-facing.
 * ``template-haskell`` is not stable, because it contains AST datatypes which need to be changed as the language evolves.
@@ -418,10 +418,10 @@ Deprecations (GR3)
 
 **General rule (GR3)**.  *If we break (GR1), for a compelling reason (GR2), we should whenever possible provide a deprecation cycle, as well as copious publicity, so that users are alerted (via depreciation warnings) to the upcoming change, have time to adapt, and can raise concerns.*
 
-A deprecation cycle should give at least one GHC major release for authors to make changes.  In th case of changes that are more difficult to accommodate, we may consider a second cycle.
+A deprecation cycle should give at least one GHC major release for authors to make changes.  In th case of changes that are more difficult to accommodate, we may consider a second cycle.  (Side note: there is a `separate conversation going on <https://github.com/haskell/pvp/issues/58>`_ about deprecation warnings and the PVP.)
 
 Note that (GR3) is not a reason to say that (GR1) is unimportant.  A deprecation cycle defers costs; it does not reduce or eliminate them.
-However, deprecation cycles are important.  They give users and library authors time to adapt to changes, without a mad panic.
+However, deprecation cycles are very important.  They give users and library authors time to adapt to changes, without a mad panic.  In particular, they allow users to upgrade GHC (e.g. to get an important bugfix) in one step, and then separately, and on a working code base, to adapt to each change individually, instead of having to do it all in one atomic step.
 
 Even changes to Experimental extensions should seek to follow (GR3), but with a significantly lower "bar".
 
