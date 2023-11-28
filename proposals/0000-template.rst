@@ -56,7 +56,7 @@ may include,
 * how the proposed change interacts with existing language or compiler
   features, in case that is otherwise ambiguous
 
-Think about how your proposed design accords with our `language design principles <principles.rst#2Language-design-principles>`_,
+Think about how your proposed design accords with our `language design principles <../principles.rst#2Language-design-principles>`_,
 and articulate that alignment explicitly wherever possible.
 
 Strive for *precision*. The ideal specification is described as a
@@ -143,7 +143,7 @@ drawbacks that cannot be resolved.
 Backward Compatibility
 ----------------------
 How well does your proposal meet the stability principles described in our
-`GHC stability principles <principles.rst#3GHC-stability-principles>`_ document?
+`GHC stability principles <../principles.rst#3GHC-stability-principles>`_ document?
 
 Will your proposed change cause any existing programs to change behaviour or
 stop working? Assess the expected impact on existing code on the following scale:
